@@ -1,0 +1,26 @@
+{
+  "name": "CyberStrike Labs",
+  "short_name": "CSLabs",
+  "description": "Interactive Cybersecurity Training - Nigeria 2026",
+  "start_url": "/cyberstrike-labs/",
+  "scope": "/cyberstrike-labs/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#030609",
+  "theme_color": "#00ff88",
+  "icons": [
+    {
+      "src": "https://godsonomichael.github.io/cyber-roadmap/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://godsonomichael.github.io/cyber-roadmap/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"]
+}
