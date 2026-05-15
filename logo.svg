@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#030f1a"/>
+      <stop offset="100%" style="stop-color:#061828"/>
+    </linearGradient>
+    <linearGradient id="glow1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ff88"/>
+      <stop offset="100%" style="stop-color:#00cc66"/>
+    </linearGradient>
+    <linearGradient id="glow2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00e5ff"/>
+      <stop offset="100%" style="stop-color:#0088ff"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow2f">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="url(#bg)"/>
+  <!-- Grid lines -->
+  <g opacity="0.08" stroke="#00ff88" stroke-width="1">
+    <line x1="0" y1="64" x2="512" y2="64"/><line x1="0" y1="128" x2="512" y2="128"/>
+    <line x1="0" y1="192" x2="512" y2="192"/><line x1="0" y1="256" x2="512" y2="256"/>
+    <line x1="0" y1="320" x2="512" y2="320"/><line x1="0" y1="384" x2="512" y2="384"/>
+    <line x1="0" y1="448" x2="512" y2="448"/>
+    <line x1="64" y1="0" x2="64" y2="512"/><line x1="128" y1="0" x2="128" y2="512"/>
+    <line x1="192" y1="0" x2="192" y2="512"/><line x1="256" y1="0" x2="256" y2="512"/>
+    <line x1="320" y1="0" x2="320" y2="512"/><line x1="384" y1="0" x2="384" y2="512"/>
+    <line x1="448" y1="0" x2="448" y2="512"/>
+  </g>
+  <!-- Outer ring -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.3"/>
+  <circle cx="256" cy="256" r="200" fill="none" stroke="#00ff88" stroke-width="1" opacity="0.15"/>
+  <!-- Circuit nodes on ring -->
+  <g fill="#00ff88" opacity="0.6">
+    <circle cx="256" cy="46" r="5"/><circle cx="466" cy="256" r="5"/>
+    <circle cx="256" cy="466" r="5"/><circle cx="46" cy="256" r="5"/>
+    <circle cx="404" cy="108" r="4"/><circle cx="404" cy="404" r="4"/>
+    <circle cx="108" cy="404" r="4"/><circle cx="108" cy="108" r="4"/>
+  </g>
+  <!-- Circuit lines from ring to center area -->
+  <g stroke="#00ff88" stroke-width="1.5" opacity="0.25" fill="none">
+    <polyline points="256,46 256,90"/>
+    <polyline points="466,256 422,256"/>
+    <polyline points="256,466 256,422"/>
+    <polyline points="46,256 90,256"/>
+    <polyline points="404,108 370,142"/>
+    <polyline points="404,404 370,370"/>
+    <polyline points="108,404 142,370"/>
+    <polyline points="108,108 142,142"/>
+  </g>
+  <!-- Shield shape -->
+  <path d="M256 100 L380 150 L380 270 Q380 370 256 420 Q132 370 132 270 L132 150 Z"
+        fill="#00ff88" opacity="0.06"/>
+  <path d="M256 100 L380 150 L380 270 Q380 370 256 420 Q132 370 132 270 L132 150 Z"
+        fill="none" stroke="#00ff88" stroke-width="2.5" opacity="0.7" filter="url(#glow)"/>
+  <!-- Terminal prompt inside shield -->
+  <text x="148" y="230" font-family="monospace" font-size="28" font-weight="bold" fill="#00ff88" opacity="0.9" filter="url(#glow)">root@kali</text>
+  <text x="148" y="262" font-family="monospace" font-size="22" fill="#00e5ff" opacity="0.8">:~# </text>
+  <text x="210" y="262" font-family="monospace" font-size="22" fill="#00ff88" opacity="0.9">_</text>
+  <!-- Scan lines in shield -->
+  <g opacity="0.12" stroke="#00ff88" stroke-width="1">
+    <line x1="145" y1="285" x2="367" y2="285"/>
+    <line x1="140" y1="305" x2="372" y2="305"/>
+    <line x1="148" y1="325" x2="364" y2="325"/>
+    <line x1="162" y1="345" x2="350" y2="345"/>
+    <line x1="185" y1="365" x2="327" y2="365"/>
+  </g>
+  <!-- Bottom text -->
+  <text x="256" y="485" font-family="Arial, sans-serif" font-size="26" font-weight="900" fill="#00ff88" text-anchor="middle" letter-spacing="6" opacity="0.9" filter="url(#glow)">CYBERSTRIKE</text>
+  <!-- Corner accent dots -->
+  <g fill="#00e5ff" opacity="0.5">
+    <circle cx="30" cy="30" r="3"/><circle cx="40" cy="30" r="3"/><circle cx="30" cy="40" r="3"/>
+    <circle cx="482" cy="30" r="3"/><circle cx="472" cy="30" r="3"/><circle cx="482" cy="40" r="3"/>
+    <circle cx="30" cy="482" r="3"/><circle cx="40" cy="482" r="3"/><circle cx="30" cy="472" r="3"/>
+    <circle cx="482" cy="482" r="3"/><circle cx="472" cy="482" r="3"/><circle cx="482" cy="472" r="3"/>
+  </g>
+</svg>
