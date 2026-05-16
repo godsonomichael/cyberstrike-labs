@@ -30,6 +30,12 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,0.03) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
 
 @keyframes flicker{0%,92%,100%{opacity:1}93%{opacity:.6}95%{opacity:1}97%{opacity:.7}99%{opacity:1}}
+
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+@keyframes popIn{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+@keyframes typeIn{from{max-height:0;opacity:0}to{max-height:300px;opacity:1}}
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{box-shadow:0 0 4px var(--green)}50%{box-shadow:0 0 16px var(--green),0 0 32px var(--green)}}
 @keyframes blink{50%{opacity:0}}
@@ -329,6 +335,36 @@ tr:hover td{background:rgba(0,255,136,.03)}
 .tc-click{font-size:.58rem;color:var(--text3);margin-top:4px;font-family:'JetBrains Mono',monospace}
 @media(max-width:560px){.technique-cards{grid-template-columns:1fr}}
 
+
+/* ====== COUNTRY MODAL ====== */
+.country-modal{position:fixed;inset:0;z-index:150;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
+.country-modal.show{display:flex}
+.cm-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:24px;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.6);animation:fadeUp .4s both}
+.cm-title{font-family:'Orbitron',monospace;font-size:.88rem;font-weight:800;color:var(--green);margin-bottom:4px}
+.cm-sub{font-size:.73rem;color:var(--text2);margin-bottom:16px;line-height:1.6}
+.country-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.country-opt{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:all .22s;text-align:center}
+.country-opt:hover{border-color:var(--green);transform:translateY(-2px)}
+.country-opt.selected{border-color:var(--green);background:rgba(0,255,136,0.07)}
+.co-flag{font-size:1.5rem;margin-bottom:4px}
+.co-name{font-size:.76rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.co-sub{font-size:.6rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.cm-confirm-btn{width:100%;padding:12px;background:var(--green);color:#000;border:none;border-radius:9px;font-family:'Orbitron',monospace;font-size:.74rem;font-weight:700;cursor:pointer;transition:all .22s;letter-spacing:.06em;box-shadow:0 6px 20px rgba(0,255,136,.3)}
+.cm-confirm-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,255,136,.45)}
+/* Country banner */
+.country-banner{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--cyan);border-radius:0 12px 12px 0;padding:13px 15px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.cb-left{display:flex;align-items:center;gap:10px}
+.cb-flag{font-size:1.4rem}
+.cb-info{flex:1}
+.cb-country{font-family:'Orbitron',monospace;font-size:.74rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.cb-sub{font-size:.66rem;color:var(--text2);line-height:1.5}
+.cb-change{font-size:.63rem;color:var(--cyan);cursor:pointer;text-decoration:underline;font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.cb-change:hover{color:var(--text)}
+/* XP float bubble */
+.xp-float-bubble{position:fixed;font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--yellow);text-shadow:0 0 10px rgba(255,215,0,.6);pointer-events:none;z-index:500;animation:floatXpUp 1.2s ease-out forwards}
+@keyframes floatXpUp{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-60px);opacity:0}}
+@media(max-width:520px){.country-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -405,7 +441,20 @@ tr:hover td{background:rgba(0,255,136,.03)}
         <div class="dash-title" id="dashTitle">INITIALIZING...</div>
         <div class="dash-sub">Nigeria 🇳🇬 · Interactive Labs · AI-Powered Training</div>
       </div>
-      <div class="xp-card">
+      
+    <!-- Country Banner -->
+    <div class="country-banner" id="countryBanner" style="display:none">
+      <div class="cb-left">
+        <span class="cb-flag" id="cbFlag">🌍</span>
+        <div class="cb-info">
+          <div class="cb-country" id="cbCountry">Loading...</div>
+          <div class="cb-sub" id="cbSub">Personalised for your location</div>
+        </div>
+      </div>
+      <span class="cb-change" onclick="openCountryModal()">Change country</span>
+    </div>
+
+  <div class="xp-card">
         <div class="xp-top">
           <div><div class="xp-rank" id="xpRank">RECRUIT</div><div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text3);margin-top:2px" id="xpNext">0 XP to next rank</div></div>
           <div class="xp-info" id="xpVal">0 / 500 XP</div>
@@ -572,6 +621,17 @@ tr:hover td{background:rgba(0,255,136,.03)}
     </div>
 
   </div><!-- /main -->
+
+<!-- COUNTRY MODAL -->
+<div class="country-modal" id="countryModal">
+  <div class="cm-card">
+    <div class="cm-title">🌍 Select Your Country</div>
+    <div class="cm-sub">This personalises employers, salaries, compliance requirements and job market data to match your location. You can change this anytime from the menu.</div>
+    <div class="country-grid" id="countryGrid"></div>
+    <button class="cm-confirm-btn" onclick="confirmCountry()">Confirm Selection →</button>
+  </div>
+</div>
+
 </div><!-- /app -->
 
 <div class="toast" id="toast"></div>
@@ -1963,6 +2023,318 @@ async function sendInjection(){
 }
 
 /* ===================== SERVICE WORKER ===================== */
+
+/* ===================== COUNTRY DATA & SELECTOR ===================== */
+const COUNTRIES = [
+  {id:'ng', flag:'🇳🇬', name:'Nigeria', sub:'Lagos · Abuja · Port Harcourt',
+   currency:'NGN', symbol:'₦', paystackKey:'pk_live_xxxxxx',
+   salaryLocal:'₦150K–₦900K/mo', salaryRemote:'$800–$4,000/mo',
+   compliance:['NDPR 2019','NDPA 2023','CBN Cybersecurity Framework','NITDA Guidelines'],
+   employers:['Access Bank','GTBank','Zenith Bank','Flutterwave','MTN Nigeria','Interswitch','Shell Nigeria','EFCC','NCC','Certfort','GVA Partners'],
+   certNotes:'NITDA offers 50% subsidy on CompTIA Security+ — apply at nitda.gov.ng',
+   demandNote:'78% of Nigerian SOC postings require Splunk or Sentinel. NDPR knowledge is your local edge.',
+   jobBoards:['Jobberman','LinkedIn Nigeria','MyJobMag','NgCareers'],
+  },
+  {id:'gh', flag:'🇬🇭', name:'Ghana', sub:'Accra · Kumasi · Takoradi',
+   currency:'GHS', symbol:'GH₵', paystackKey:'pk_live_xxxxxx',
+   salaryLocal:'GH₵3,000–15,000/mo', salaryRemote:'$700–$3,000/mo',
+   compliance:['Data Protection Act 2012','Bank of Ghana Cybersecurity Directive','NCA Guidelines'],
+   employers:['Ecobank Ghana','MTN Ghana','Stanbic Bank','Vodafone Ghana','Ghana Revenue Authority','KPMG Ghana'],
+   certNotes:'NITA-Ghana supports digital skills development. Check nita.gov.gh for subsidies.',
+   demandNote:'Ghanaian fintechs (Zeepay, Fido) are rapidly expanding cybersecurity teams.',
+   jobBoards:['Jobberman Ghana','LinkedIn','BrighterMonday Ghana'],
+  },
+  {id:'ke', flag:'🇰🇪', name:'Kenya', sub:'Nairobi · Mombasa · Kisumu',
+   currency:'KES', symbol:'KSh', paystackKey:'pk_live_xxxxxx',
+   salaryLocal:'KSh 80K–400K/mo', salaryRemote:'$900–$4,000/mo',
+   compliance:['Kenya Data Protection Act 2019','CBK Cybersecurity Guidelines','Communications Authority Regulations'],
+   employers:['Safaricom','Equity Bank','KCB Group','M-Pesa Africa','I&M Bank','Andela Kenya'],
+   certNotes:'Kenya ICT Authority supports cyber skills. Nairobi is East Africa\'s tech hub.',
+   demandNote:'Kenya\'s fintech boom (M-Pesa ecosystem) creates massive demand for security professionals.',
+   jobBoards:['BrighterMonday Kenya','LinkedIn','Fuzu'],
+  },
+  {id:'za', flag:'🇿🇦', name:'South Africa', sub:'Johannesburg · Cape Town · Durban',
+   currency:'ZAR', symbol:'R', paystackKey:'pk_live_xxxxxx',
+   salaryLocal:'R25,000–R80,000/mo', salaryRemote:'$1,200–$5,000/mo',
+   compliance:['POPIA 2020','ECTA','SARB Cybersecurity Guidelines','JSE Requirements'],
+   employers:['Standard Bank','FirstRand','Absa','MTN SA','Discovery','Telkom','Vodacom'],
+   certNotes:'SABS and ISACA SA chapter active. Strong market for CISM and CISSP holders.',
+   demandNote:'SA has the most mature cybersecurity market in Africa. POPIA compliance drives massive demand.',
+   jobBoards:['LinkedIn','Careers24','PNet','Indeed SA'],
+  },
+  {id:'gb', flag:'🇬🇧', name:'United Kingdom', sub:'London · Manchester · Edinburgh',
+   currency:'GBP', symbol:'£', paystackKey:null,
+   salaryLocal:'£35,000–£90,000/yr', salaryRemote:'$2,000–$7,000/mo',
+   compliance:['UK GDPR','NIS Regulations 2018','ICO Guidelines','Cyber Essentials'],
+   employers:['GCHQ','BAE Systems','BT Security','HSBC','Barclays','Darktrace','CrowdStrike UK'],
+   certNotes:'NCSC Cyber Accelerator. UK has Cyber Essentials certification scheme — very employer-valued.',
+   demandNote:'UK has 50,000+ unfilled cybersecurity roles. Nigerian talent increasingly filling remote roles.',
+   jobBoards:['CyberSecurityJobs.net','LinkedIn UK','CWJobs','Indeed UK'],
+  },
+  {id:'us', flag:'🇺🇸', name:'United States', sub:'New York · San Francisco · Austin',
+   currency:'USD', symbol:'$', paystackKey:null,
+   salaryLocal:'$70,000–$180,000/yr', salaryRemote:'$3,000–$10,000/mo',
+   compliance:['NIST CSF','HIPAA','SOX','PCI DSS','CMMC (DoD)','State Privacy Laws'],
+   employers:['Microsoft','Google','Amazon','CrowdStrike','Palo Alto Networks','Mandiant','NSA','FBI'],
+   certNotes:'DoD 8570 requires specific certs (Security+, CISSP) for government contracts.',
+   demandNote:'3.5 million unfilled cybersecurity jobs globally, majority in US. Remote roles widely available to African talent.',
+   jobBoards:['LinkedIn','Indeed','Dice','CyberSeek','USAJobs (government)'],
+  },
+  {id:'ca', flag:'🇨🇦', name:'Canada', sub:'Toronto · Vancouver · Ottawa',
+   currency:'CAD', symbol:'CA$', paystackKey:null,
+   salaryLocal:'CA$65,000–150,000/yr', salaryRemote:'$2,500–$6,000/mo',
+   compliance:['PIPEDA','Quebec Law 25','OSFI Cybersecurity Guidelines','CSE Guidelines'],
+   employers:['RBC','TD Bank','Shopify','BlackBerry','CGI Group','Public Safety Canada'],
+   certNotes:'Canada actively recruits international cyber talent. Global Skills Strategy visa program available.',
+   demandNote:'Canada has immigration pathways specifically designed for tech workers. Strong demand in Toronto/Ottawa.',
+   jobBoards:['LinkedIn Canada','Indeed Canada','Workopolis','Job Bank Canada'],
+  },
+  {id:'de', flag:'🇩🇪', name:'Germany', sub:'Berlin · Munich · Frankfurt',
+   currency:'EUR', symbol:'€', paystackKey:null,
+   salaryLocal:'€50,000–€110,000/yr', salaryRemote:'$2,000–$6,000/mo',
+   compliance:['GDPR','BSI-Grundschutz','NIS2 Directive','BDSG'],
+   employers:['SAP','Deutsche Telekom','Siemens','Allianz','Deutsche Bank','BSI (Federal Office)'],
+   certNotes:'BSI certifications highly valued in Germany. English-friendly companies increasing rapidly.',
+   demandNote:'Germany has 137,000+ unfilled IT jobs. NIS2 directive (2024) massively increased security demand.',
+   jobBoards:['StepStone','LinkedIn DACH','XING','Indeed Germany'],
+  },
+];
+
+let userCountry = null;
+let selectedCountryId = 'ng';
+
+function openCountryModal(){
+  renderCountryGrid();
+  document.getElementById('countryModal').classList.add('show');
+}
+function closeCountryModal(){
+  document.getElementById('countryModal').classList.remove('show');
+}
+function renderCountryGrid(){
+  const grid = document.getElementById('countryGrid');
+  if(!grid) return;
+  grid.innerHTML = COUNTRIES.map(co => `
+    <div class="country-opt ${co.id===selectedCountryId?'selected':''}" onclick="selectCountry('${co.id}')">
+      <div class="co-flag">${co.flag}</div>
+      <div class="co-name">${co.name}</div>
+      <div class="co-sub">${co.sub}</div>
+    </div>`).join('');
+}
+function selectCountry(id){
+  selectedCountryId = id;
+  document.querySelectorAll('.country-opt').forEach(el=>{
+    el.classList.toggle('selected', el.onclick.toString().includes(`'${id}'`));
+  });
+  // Use data attribute instead
+  document.querySelectorAll('.country-opt').forEach(el=>{
+    const match = el.getAttribute('onclick') || '';
+    el.classList.toggle('selected', match.includes(`'${id}'`));
+  });
+}
+function confirmCountry(){
+  userCountry = COUNTRIES.find(c=>c.id===selectedCountryId) || COUNTRIES[0];
+  localStorage.setItem('csl-country', selectedCountryId);
+  closeCountryModal();
+  updateCountryBanner();
+  if(uData){
+    uData.country = selectedCountryId;
+    save();
+  }
+  showToast('🌍 Location set to '+userCountry.name,'var(--green)');
+}
+function loadSavedCountry(){
+  const saved = (uData && uData.country) || localStorage.getItem('csl-country') || 'ng';
+  selectedCountryId = saved;
+  userCountry = COUNTRIES.find(c=>c.id===saved) || COUNTRIES[0];
+  updateCountryBanner();
+  // Show country modal on first login if not set
+  if(!localStorage.getItem('csl-country') && !uData.country){
+    setTimeout(()=>openCountryModal(), 800);
+  }
+}
+function updateCountryBanner(){
+  if(!userCountry) return;
+  const banner = document.getElementById('countryBanner');
+  const flag = document.getElementById('cbFlag');
+  const name = document.getElementById('cbCountry');
+  const sub = document.getElementById('cbSub');
+  if(banner) banner.style.display='flex';
+  if(flag) flag.textContent = userCountry.flag;
+  if(name) name.textContent = userCountry.name + ' · Cybersecurity Market';
+  if(sub) sub.innerHTML = `${userCountry.salaryRemote} remote · ${userCountry.compliance[0]} · ${userCountry.employers.length} local employers`;
+}
+
+/* ===================== VISUAL XP FLOAT ===================== */
+function floatXP(n,x,y){
+  const el=document.createElement('div');
+  el.className='xp-float-bubble';
+  el.textContent='+'+n+' XP';
+  el.style.cssText=`left:${x||48}%;top:${y||38}%;position:fixed;`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1200);
+}
+
+/* ===================== COMMAND EXPLANATION (visual feedback) ===================== */
+async function getCommandExplanation(cmd, output){
+  const panel = document.getElementById('cmdExplainPanel');
+  const body = document.getElementById('cmdExplainBody');
+  if(!panel || !body) return;
+  panel.style.display = 'block';
+  body.innerHTML = '<span style="color:var(--text3);font-family:JetBrains Mono,monospace;font-size:.68rem">🔍 Analysing output...</span>';
+  try{
+    const res = await fetch(WORKER_URL, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'llama-3.1-8b-instant',
+        messages:[
+          {role:'system', content:'You are a beginner-friendly cybersecurity trainer. Explain this terminal output in plain English in 3-4 sentences. What does it mean? What are the key findings? What should the user do next? No jargon without explanation.'},
+          {role:'user', content:'Command: '+cmd+'\n\nOutput:\n'+output.slice(0,500)+'\n\nExplain to a complete beginner in 3-4 clear sentences.'}
+        ], max_tokens:180, temperature:0.5
+      })
+    });
+    const data = await res.json();
+    body.innerHTML = data.choices?.[0]?.message?.content || 'Run more commands to see explanations here.';
+  } catch(e){
+    body.innerHTML = 'Explanation unavailable — check internet connection.';
+  }
+}
+
+/* ===================== BEGINNER GUIDE INIT ===================== */
+function renderBeginnerGuides(){
+  // Called after each view switch to ensure guides are visible
+  document.querySelectorAll('.guide-box').forEach(box=>{
+    box.style.animation = 'fadeUp .4s both';
+  });
+}
+
+/* ===================== PATCH: initAll to load country ===================== */
+const _origInitAll = window.initAll;
+window.initAll = function(){
+  if(_origInitAll) _origInitAll();
+  loadSavedCountry();
+  renderBeginnerGuides();
+};
+
+/* ===================== REAL-WORLD COMMAND CONTEXT ===================== */
+// Inject country-specific context into terminal AI system prompt
+function getCountryTerminalContext(){
+  if(!userCountry) return 'The user is in Nigeria.';
+  return `The user is in ${userCountry.name}. Key employers in their country: ${userCountry.employers.slice(0,5).join(', ')}. Relevant compliance: ${userCountry.compliance[0]}. Make real-world examples relevant to their location.`;
+}
+
+/* ===================== PATCH: runCommand to use country context + explanation ===================== */
+const _origRunCommand = window.runCommand;
+window.runCommand = async function(){
+  const ti = document.getElementById('termInput');
+  const cmd = ti ? ti.value.trim() : '';
+  if(!cmd) return;
+  const btn = document.getElementById('runBtn');
+  const status = document.getElementById('termStatus');
+  if(btn) btn.disabled = true;
+  if(status) status.textContent = 'RUNNING...';
+  if(ti) ti.value = '';
+  
+  // History
+  cmdHistory.unshift(cmd); histIdx = -1;
+  if(cmdHistory.length > 50) cmdHistory.pop();
+
+  if(cmd === 'clear'){
+    const tb = document.getElementById('termBody');
+    if(tb) tb.innerHTML = '';
+    if(btn) btn.disabled = false;
+    if(status) status.textContent = 'AI READY';
+    return;
+  }
+  if(cmd === 'help'){
+    tprint('Available categories: '+Object.keys(CMD_CATS).join(' · '),'tl-info');
+    tprint('Type any Kali/pentest command · UP/DOWN = history · clear = clear screen','tl-out');
+    if(btn) btn.disabled = false;
+    if(status) status.textContent = 'AI READY';
+    return;
+  }
+
+  tprint('root@kali:~# '+cmd, 'tl-prompt');
+  const thinking = document.createElement('div');
+  thinking.className = 'tl tl-thinking';
+  thinking.textContent = '⟳ Simulating...';
+  const tb = document.getElementById('termBody');
+  if(tb){ tb.appendChild(thinking); tb.scrollTop = tb.scrollHeight; }
+
+  try{
+    const res = await fetch(WORKER_URL,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'llama-3.1-8b-instant',
+        messages:[{
+          role:'system',
+          content:`You are a Kali Linux terminal simulator for cybersecurity training. Context: ${getCountryTerminalContext()}
+
+TARGET ENVIRONMENT:
+- IP: 10.10.10.1 (hostname: target.lab) · Ubuntu 20.04
+- Open ports: 21(vsftpd 3.0.3) 22(OpenSSH 7.9) 80(Apache 2.4.41) 445(Samba 4.11) 3306(MySQL 5.7)
+- Web: WordPress 5.4 · /backup dir exists · /admin returns 302
+- Creds found by hydra: admin:password123 (SSH) root:toor (MySQL)
+- SUID: /usr/bin/vim.basic /usr/bin/find /usr/bin/python3.8
+
+OUTPUT RULES:
+- Return ONLY raw terminal output, no markdown, no explanation outside the output
+- For nmap: show realistic port table with versions
+- For metasploit: show framework messages and session info
+- For hydra: show progress then find password123 for admin
+- For gobuster: show /admin /backup /config /wordpress
+- For hashcat: eventually crack to "password123"
+- Max 28 lines · Include realistic timing info`
+        },{role:'user',content:cmd}],
+        max_tokens:450, temperature:0.25
+      })
+    });
+    const data = await res.json();
+    if(data.error) throw new Error(data.error.message);
+    const output = data.choices?.[0]?.message?.content || 'Command executed.';
+    if(thinking.parentNode) thinking.remove();
+    
+    output.split('\n').forEach(line=>{
+      const l = line.toLowerCase();
+      let cls = 'tl-out';
+      if(l.includes('[+]')||l.includes('open')||l.includes('success')||l.includes('found')||l.includes('login:')) cls='tl-success';
+      else if(l.includes('[-]')||l.includes('error')||l.includes('failed')||l.includes('denied')) cls='tl-err';
+      else if(l.includes('[!]')||l.includes('warning')||l.includes('filtered')) cls='tl-warn';
+      else if(l.includes('[*]')||l.includes('starting')||l.includes('nmap')||l.includes('hydra')) cls='tl-info';
+      else if(line.startsWith('#')||line.startsWith('//')) cls='tl-comment';
+      tprint(line, cls);
+    });
+
+    uData.cmdsRun = (uData.cmdsRun||0)+1;
+    save(); updateDashStats();
+    addXP(10);
+    getCommandExplanation(cmd, output);
+
+  } catch(err){
+    if(thinking.parentNode) thinking.remove();
+    tprint('[ERROR] '+err.message, 'tl-err');
+    tprint('Check your internet connection and try again.','tl-warn');
+  }
+  if(btn) btn.disabled = false;
+  if(status) status.textContent = 'AI READY';
+};
+
+/* ===================== COUNTRY IN MENU ===================== */
+function openMenu(){
+  document.getElementById('menuOverlay').classList.add('open');
+  document.getElementById('menuTray').classList.add('open');
+  // Update menu user info with country
+  updateXPUI();
+  if(userCountry){
+    const mr = document.getElementById('menuRank');
+    if(mr) mr.textContent = getRank(uData.xp||0).n+' · '+userCountry.flag+' '+userCountry.name;
+  }
+}
+function closeMenu(){
+  document.getElementById('menuOverlay').classList.remove('open');
+  document.getElementById('menuTray').classList.remove('open');
+}
+
+
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('/cyberstrike-labs/sw.js')
