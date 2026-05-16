@@ -306,6 +306,29 @@ tr:hover td{background:rgba(0,255,136,.03)}
   .stats-row{grid-template-columns:repeat(2,1fr)}
   .nav-tabs{display:none}
 }
+
+/* ====== SVG LOGO ====== */
+.auth-logo-svg{width:72px;height:72px;margin:0 auto 10px;animation:float 4s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(0,255,136,0.4));display:block}
+[data-theme="light"] .auth-logo-svg{filter:drop-shadow(0 0 12px rgba(0,136,68,0.4))}
+
+/* ====== GUIDE BOXES ====== */
+.guide-box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--cyan);border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:14px}
+.guide-box-title{font-family:'Orbitron',monospace;font-size:.65rem;color:var(--cyan);margin-bottom:8px;letter-spacing:.1em;display:flex;align-items:center;gap:7px}
+.guide-box-title::before{content:'📖'}
+.guide-body .step{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start}
+.guide-body .step-num{background:var(--green);color:#000;font-family:'Orbitron',monospace;font-size:.6rem;font-weight:700;min-width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+
+/* ====== TECHNIQUE CARDS ====== */
+.technique-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.tech-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px;cursor:pointer;transition:all .2s}
+.tech-card:hover,.tech-card.active{border-color:var(--red);background:rgba(255,51,85,.04)}
+.tc-tech-name{font-family:'Orbitron',monospace;font-size:.65rem;font-weight:700;color:var(--text);margin-bottom:5px}
+.tc-tech-desc{font-size:.7rem;color:var(--text2);line-height:1.5;margin-bottom:7px}
+.tc-example{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--yellow);background:var(--bg2);padding:6px 9px;border-radius:5px;cursor:pointer;transition:all .2s;border:1px solid transparent;line-height:1.5}
+.tc-example:hover{border-color:var(--yellow)}
+.tc-click{font-size:.58rem;color:var(--text3);margin-top:4px;font-family:'JetBrains Mono',monospace}
+@media(max-width:560px){.technique-cards{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -336,7 +359,16 @@ tr:hover td{background:rgba(0,255,136,.03)}
 <div id="app" style="display:none">
   <nav class="nav">
     <div class="nav-inner">
-      <div class="nav-logo" onclick="switchView('dash')">⚡ CYBERSTRIKE LABS</div>
+            <div class="nav-logo" onclick="switchView('dash')">
+        <svg style="width:30px;height:30px;flex-shrink:0;filter:drop-shadow(0 0 6px rgba(0,255,136,0.4))" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="80" fill="#030f1a"/>
+          <path d="M256 110 L370 155 L370 265 Q370 360 256 410 Q142 360 142 265 L142 155 Z" fill="none" stroke="#00ff88" stroke-width="3" opacity="0.9"/>
+          <text x="158" y="242" font-family="monospace" font-size="22" font-weight="bold" fill="#00ff88">root@</text>
+          <text x="158" y="268" font-family="monospace" font-size="19" fill="#00e5ff">kali# </text>
+          <text x="216" y="268" font-family="monospace" font-size="19" fill="#00ff88">_</text>
+        </svg>
+        <span class="nav-logo-text">CyberStrike Labs</span>
+      </div>
       <div class="nav-tabs">
         <button class="nav-tab active" id="nt-dash" onclick="switchView('dash')">HQ</button>
         <button class="nav-tab" id="nt-pentest" onclick="switchView('pentest')">PENTEST LAB</button>
@@ -1938,6 +1970,112 @@ if('serviceWorker' in navigator){
       .catch(e=>console.log('SW error:',e));
   });
 }
+
+/* ===================== NAVIGATION MANAGEMENT ===================== */
+
+/* ── History state management ── */
+(function(){
+  // Push initial state
+  if(!window.history.state || !window.history.state.view){
+    window.history.replaceState({view:'dash'}, '', window.location.href);
+  }
+
+  // Override switchView to push history
+  const _origSwitch = window.switchView;
+  window.switchView = function(v){
+    const current = window.history.state && window.history.state.view;
+    if(current !== v){
+      window.history.pushState({view:v}, '', window.location.href);
+    }
+    if(_origSwitch) _origSwitch(v);
+  };
+
+  // Handle browser back/forward
+  window.addEventListener('popstate', function(e){
+    const view = (e.state && e.state.view) || 'dash';
+    // Call the original switcher directly (no history push)
+    document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+    const viewEl = document.getElementById('view-'+view);
+    const tabEl  = document.getElementById('nt-'+view);
+    if(viewEl) viewEl.classList.add('active');
+    if(tabEl)  tabEl.classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+})();
+
+/* ── Double-tap back to exit ── */
+let _backPressCount = 0;
+let _backPressTimer = null;
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' || (e.key === 'Backspace' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))){
+    handleBackPress();
+  }
+});
+// Android hardware back button via popstate when at root
+window.addEventListener('popstate', function(e){
+  if(!e.state || e.state.view === 'dash'){
+    // We're at the root — double-tap logic
+    const wasAtDash = document.getElementById('view-dash') && document.getElementById('view-dash').classList.contains('active');
+    if(wasAtDash){
+      handleBackPress();
+      // Re-push state so we don't actually leave
+      window.history.pushState({view:'dash'}, '', window.location.href);
+    }
+  }
+});
+function handleBackPress(){
+  _backPressCount++;
+  if(_backPressTimer) clearTimeout(_backPressTimer);
+  if(_backPressCount === 1){
+    toast('Press back again to exit','var(--yellow)');
+    _backPressTimer = setTimeout(()=>{ _backPressCount = 0; }, 2500);
+  } else if(_backPressCount >= 2){
+    _backPressCount = 0;
+    // On PWA standalone, try to close; else show message
+    if(window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches){
+      window.close();
+    } else {
+      window.history.go(-(window.history.length - 1));
+    }
+  }
+}
+
+/* ── External links — open in new tab, preserve session ── */
+document.addEventListener('click', function(e){
+  const link = e.target.closest('a[href]');
+  if(!link) return;
+  const href = link.getAttribute('href');
+  if(!href || href.startsWith('#') || href.startsWith('javascript')) return;
+  // Internal same-page links
+  if(href.startsWith('/') || href.includes(window.location.hostname)) return;
+  // External link — open new tab
+  e.preventDefault();
+  const newTab = window.open(href, '_blank', 'noopener,noreferrer');
+  if(!newTab){
+    // Popup blocked — fallback
+    toast('Opening link... (allow popups if blocked)','var(--cyan)');
+    setTimeout(()=>{ window.open(href,'_blank','noopener,noreferrer'); }, 300);
+  }
+  // Session is preserved — user stays on current page
+}, true);
+
+/* ── Save current view to sessionStorage so refresh restores it ── */
+window.addEventListener('beforeunload', function(){
+  const activeView = document.querySelector('.view.active');
+  if(activeView) sessionStorage.setItem('csl-last-view', activeView.id.replace('view-',''));
+});
+
+/* ── Restore view on load ── */
+window.addEventListener('load', function(){
+  const lastView = sessionStorage.getItem('csl-last-view');
+  if(lastView && lastView !== 'dash' && document.getElementById('view-'+lastView)){
+    setTimeout(()=>switchView(lastView), 400);
+  }
+  // Push initial state for back button
+  window.history.replaceState({view: lastView||'dash'}, '', window.location.href);
+});
+
 </script>
 </body>
 </html>
